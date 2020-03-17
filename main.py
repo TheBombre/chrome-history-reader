@@ -1,6 +1,6 @@
 import json
 import datetime 
-# TODO: README.md
+
 available_filter_types = ("favicon_url", "page_transition", "title", "url", "client_id", "time_usec")
 
 
@@ -134,7 +134,7 @@ def get_filtered_sites(history, filter_type, filter_value):
             if history[i][filter_type] == filter_value:
                 sites.append(history[i])
     else:
-        return print("Filter specified is not supported")
+        raise Exception("Filter specified is not supported")
 
     return sites
 
@@ -155,7 +155,7 @@ def write_to_file(history, filter_type, file_name='output'):
             for x in range(len(history)):
                 file.write(f"{history[x][filter_type]}\n")
     else:
-        print("Filter specified is not supported")
+        raise Exception("Filter specified is not supported")
 
 
 if __name__ == '__main__':
