@@ -1,11 +1,23 @@
 import json
 import datetime 
-# TODO: Refactor to make it more generalised to get any website from browsing history
 # TODO: README.md
-# TODO: A function to filter out browser history by any available keys
+available_filter_types = ("favicon_url", "page_transition", "title", "url", "client_id", "time_usec")
 
 
-def main(): pass
+def main(file_name, year, day, month, url):
+    """
+
+    :param file_name: name of the file with the browsing data
+    :param year: specification of the year to search for (int)
+    :param day: specification of the day to search for (int)
+    :param month: specification of the month to search for (int)
+    :param url: the url being searched for in the history
+    :return: nothing
+    """
+    browser_history = get_browsing_data(file_name)
+    sites = get_sites_by_date_and_url(history=browser_history, url=url,
+                                      year=year, month=month, day=day)
+    write_to_file(history=sites, filter_type="url")
 
 
 def get_browsing_data(file_name):
@@ -106,20 +118,6 @@ def get_sites_by_date_and_url(history, url, year, day, month):
     url_filtered_history = get_sites_by_url(history=date_filtered_history, url=url)
     return url_filtered_history
 
-    # for i in range(len(history)):
-    #     time_usec = history[i]['time_usec']
-    #     timestamp = (time_usec/1000000)
-    #
-    #     date_obj = datetime.datetime.fromtimestamp(timestamp)
-    #     year = date_obj.year
-    #     month = date_obj.month
-    #     day = date_obj.day
-    #     if year == 2020 and month == 3 and day == 10:
-    #         url = history[i]['url']
-    #         if url.startswith(url):
-    #             test_string = f"{url}\n"
-    #             file_data.append(test_string)
-
 
 def get_filtered_sites(history, filter_type, filter_value):
     """
@@ -131,7 +129,6 @@ def get_filtered_sites(history, filter_type, filter_value):
     """
     sites = []
 
-    available_filter_types = ("favicon_url", "page_transition", "title", "client_id", "time_usec")
     if filter_type in available_filter_types:
         for i in range(len(history)):
             if history[i][filter_type] == filter_value:
@@ -142,15 +139,25 @@ def get_filtered_sites(history, filter_type, filter_value):
     return sites
 
 
-def write_to_file(file_data, file_name='output'):
+def write_to_file(history, filter_type, file_name='output'):
     """
-    It writes the file_data to a specified file
-    :param file_data: a list of data to be written to the specified file
+    It writes the all elements in history or a certain key of the elements to a specified file
+    :param filter_type: the key in the json data that is being targeted (supported once shown in available_filter_types)
+    :param history: a list of data to be written to the specified file
     :param file_name: name of file to export data to excluding extension as txt is assumed
     :return: nothing
     """
-    with open(f"{file_name}.txt", 'w') as file:
-        file.writelines(file_data)
+    if not filter_type:
+        with open(f"{file_name}.txt", 'w') as file:
+            file.writelines(history)
+    elif filter_type in available_filter_types:
+        with open(f"{file_name}.txt", 'w') as file:
+            for x in range(len(history)):
+                file.write(f"{history[x][filter_type]}\n")
+    else:
+        print("Filter specified is not supported")
 
-test = 'https://www.youtube.com/watch?v='
+
+if __name__ == '__main__':
+    main('browser-history.json', year=2020, month=3, day=10, url='https://www.youtube.com/watch?v=')
 
